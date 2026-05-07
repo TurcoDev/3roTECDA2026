@@ -2,7 +2,7 @@
 -- 05_indexes.sql - Índices (Indexes)
 -- ============================================================
 
-USE tresa;
+USE tecda;
 
 -- Ejecutar ANTES de crear el índice para comparar el plan de ejecución
 -- MySQL usa un full table scan sin índice

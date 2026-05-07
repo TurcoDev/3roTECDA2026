@@ -2,7 +2,7 @@
 -- 06_transactions.sql - Transacciones
 -- ============================================================
 
-USE tresa;
+USE tecda;
 
 -- ----------------------------------------------------------------
 -- COMMIT: todas las operaciones se confirman juntas

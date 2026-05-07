@@ -2,8 +2,8 @@
 -- 01_setup.sql - Creación de la base de datos y tablas
 -- ============================================================
 
-CREATE DATABASE IF NOT EXISTS tresa;
-USE tresa;
+CREATE DATABASE IF NOT EXISTS tecda;
+USE tecda;
 
 -- Tabla principal de usuarios
 CREATE TABLE user (

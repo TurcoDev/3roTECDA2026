@@ -2,7 +2,7 @@
 -- 03_relations.sql - Relaciones entre tablas (Foreign Keys)
 -- ============================================================
 
-USE tresa;
+USE tecda;
 
 -- Agregar columnas de relación a la tabla user
 ALTER TABLE user

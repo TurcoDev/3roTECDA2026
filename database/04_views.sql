@@ -2,7 +2,7 @@
 -- 04_views.sql - Vistas (Views)
 -- ============================================================
 
-USE tresa;
+USE tecda;
 
 -- Vista que combina user, profession y city en una sola consulta
 CREATE VIEW vw_user_info AS

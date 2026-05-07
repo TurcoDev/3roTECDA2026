@@ -2,7 +2,7 @@
 -- 02_data.sql - Inserción de datos iniciales
 -- ============================================================
 
-USE tresa;
+USE tecda;
 
 -- Usuarios (sin profession_id ni city_id por ahora, se agregan en 03_relations.sql)
 INSERT INTO user (name, age) VALUES

@@ -2,7 +2,7 @@
 -- 07_procedures.sql - Stored Procedures (Procedimientos almacenados)
 -- ============================================================
 
-USE tresa;
+USE tecda;
 
 -- Stored Procedure: devuelve usuarios cuya edad es mayor o igual al parámetro
 DELIMITER //
@@ -37,4 +37,4 @@ CALL count_users_in_city('Tandil', @resultado);
 SELECT @resultado AS usuarios_en_tandil;
 
 -- Ver todos los procedimientos almacenados de la base de datos
-SHOW PROCEDURE STATUS WHERE Db = 'tresa';
+SHOW PROCEDURE STATUS WHERE Db = 'tecda';

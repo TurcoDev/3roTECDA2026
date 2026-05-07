@@ -3,7 +3,7 @@
 -- Tema: próxima clase
 -- ============================================================
 
-USE tresa;
+USE tecda;
 
 -- Un TRIGGER es un bloque de código que se ejecuta automáticamente
 -- cuando ocurre un evento DML (INSERT, UPDATE, DELETE) en una tabla.
@@ -108,10 +108,10 @@ DELIMITER ;
 INSERT INTO user (name, age, profession_id, city_id) VALUES ('Carlos', 25, 1, 1);
 
 -- UPDATE dispara trg_before_update_user_age (valida) y trg_after_update_user (audita)
-UPDATE user SET age = 26 WHERE name = 'Carlos';
+UPDATE user SET age = 46 WHERE id = 6;
 
 -- DELETE dispara trg_after_delete_user (audita)
-DELETE FROM user WHERE name = 'Carlos';
+DELETE FROM user WHERE id = 6;
 
 -- Verificar el registro de auditoría
 SELECT * FROM audit_user ORDER BY action_date DESC;
@@ -120,4 +120,4 @@ SELECT * FROM audit_user ORDER BY action_date DESC;
 -- INSERT INTO user (name, age) VALUES ('Test', -1);
 
 -- Ver todos los triggers de la base de datos
-SHOW TRIGGERS FROM tresa;
+SHOW TRIGGERS FROM tecda;
