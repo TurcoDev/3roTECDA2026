@@ -1,7 +1,4 @@
-let users = [
-  { id: 1, name: "Juan" },
-  { id: 2, name: "María" },
-];
+import { users } from "../data/data.js";
 
 // Simulamos funciones de base de datos
 
