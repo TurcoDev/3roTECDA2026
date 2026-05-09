@@ -1,14 +1,27 @@
+import { useEffect, useState } from 'react'
 import CardUser from './components/CardUser'
 import './App.css'
-import { results } from './data/data'
+// import { results } from './data/data'
 import Button from './components/Button'
 
 function App() {
 
+  const [usersArray, setUsersArray] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:3000/users')
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        setUsersArray(data);
+      })
+      .catch(error => console.error(error)) 
+  }, []);
+
   return (
     <>
       <Button />
-      {results.map((user, index) => (
+      {usersArray?.map((user, index) => (
         <CardUser
           key={index}
           name={`${user.name.first} ${user.name.last}`}

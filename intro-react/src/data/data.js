@@ -1,3 +1,5 @@
+// https://randomuser.me/api/?inc=email,name,picture&results=10
+
 
 export const results = [
     {
