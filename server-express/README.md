@@ -104,3 +104,62 @@ app.listen(PORT, () => {
 - Prueba tus rutas usando Postman, Insomnia o desde el frontend.
 
 ---
+
+## Datos de `users`
+
+En este proyecto hay un archivo con datos de ejemplo de usuarios que puedes usar en tus rutas. Ver el archivo de datos aquí: [server-express/src/data/data.js](server-express/src/data/data.js#L1-L200)
+
+Ejemplo de cómo exponer esos usuarios desde el servidor (puedes añadir esto en `server.js` o en tu router):
+
+```js
+import express from 'express'
+import { users } from './src/data/data.js'
+
+const app = express()
+
+app.get('/api/users', (req, res) => {
+  res.json(users)
+})
+```
+
+También hay un ejemplo sencillo de manejo de usuarios en [server-express/server.js](server-express/server.js#L1-L200) que muestra rutas `GET`, `POST`, `PUT` y `DELETE` usando un arreglo local `users`.
+
+## Habilitar CORS para un frontend React
+
+Cuando sirves un frontend (por ejemplo una app creada con Vite/React que corre en `http://localhost:5173`) y tu API está en otro puerto (`http://localhost:3000`), necesitarás permitir solicitudes cross-origin en el servidor.
+
+1. Instala el paquete `cors` (si no está instalado):
+
+```bash
+npm install cors
+```
+
+2. Configura `cors` en tu servidor (por ejemplo en `server.js`):
+
+```js
+import express from 'express'
+import cors from 'cors'
+
+const app = express()
+
+// Permitir solo el origen del frontend (más seguro)
+app.use(cors({ origin: 'http://localhost:5173' }))
+
+// Para desarrollo rápido puedes permitir todos los orígenes (no recomendado en producción)
+// app.use(cors())
+
+app.use(express.json())
+```
+
+3. Ejemplo de llamada desde React (fetch en `useEffect` o similar):
+
+```js
+fetch('http://localhost:3000/api/users')
+  .then(res => res.json())
+  .then(data => setUsers(data))
+  .catch(err => console.error(err))
+```
+
+Notas:
+- Si usas otro puerto para el frontend, reemplaza `http://localhost:5173` por la URL correcta.
+- En producción, restringe `origin` a los dominios que realmente necesites.

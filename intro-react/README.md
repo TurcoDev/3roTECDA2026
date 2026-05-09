@@ -124,3 +124,64 @@ useEffect(() => {
 ---
 
 Si querés, puedo ajustar los ejemplos al código del proyecto o añadir más detalles y ejemplos interactivos.
+
+## Ejemplo: consumo de API local (http://localhost:3000)
+
+A continuación hay un ejemplo práctico de un componente React que consume una API local corriendo en `http://localhost:3000`, ruta `/users`. Asegurate de tener el backend en ejecución y que permita CORS.
+
+```jsx
+import { useEffect, useState } from 'react';
+
+function UsuariosList() {
+	const [usuarios, setUsuarios] = useState(null);
+	const [error, setError] = useState(null);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		let mounted = true;
+		fetch('http://localhost:3000/users')
+			.then(res => {
+				if (!res.ok) throw new Error('Respuesta inválida ' + res.status);
+				return res.json();
+			})
+			.then(data => { if (mounted) setUsuarios(data); })
+			.catch(err => { if (mounted) setError(err.message); })
+			.finally(() => { if (mounted) setLoading(false); });
+
+		return () => { mounted = false; };
+	}, []);
+
+	if (loading) return <p>Cargando...</p>;
+	if (error) return <p>Error: {error}</p>;
+	if (!usuarios || usuarios.length === 0) return <p>No hay usuarios.</p>;
+
+	return (
+		<ul>
+			{usuarios.map(u => (
+				<li key={u.id}>{u.name} — {u.email}</li>
+			))}
+		</ul>
+	);
+}
+
+export default UsuariosList;
+```
+
+Uso: importar y usar `<UsuariosList />` en `App.jsx` o el componente donde quieras mostrar la lista. Por ejemplo:
+
+```jsx
+import UsuariosList from './components/UsuariosList';
+
+function App() {
+	return (
+		<div>
+			<h1>Usuarios</h1>
+			<UsuariosList />
+		</div>
+	);
+}
+
+export default App;
+```
+
+Nota: el backend debe exponer `GET /users` que devuelva JSON (array de objetos con `id`, `name`, `email`).
