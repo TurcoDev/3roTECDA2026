@@ -1,8 +1,43 @@
 import { users } from "../data/data.js";
+import connection from '../db/dbConnect.js';
+
+connection.connect();
+console.log('Connection established successfully');
+
+
+
 
 // Simulamos funciones de base de datos
 
-const findAll = () => users;
+// const findAll = () => users;
+
+// mysql2 con callbacks
+const findAll = async () => {
+  return new Promise((resolve, reject) => {
+    connection.query('SELECT * FROM user;', (error, results) => {
+      if (error) {
+        return reject(error);
+      }
+      resolve(results);
+    });
+  });
+};
+
+
+// mysql2/promise con async/await
+// const findAll = async () => {
+//   try {
+//     // query() ahora devuelve una promesa que podemos "esperar"
+//     const [results, fields] = await connection.query('SELECT * FROM user;');
+
+//     // Retornamos directamente los resultados
+//     return results;
+//   } catch (error) {
+//     console.error('Error en la consulta:', error);
+//     throw error;
+//   }
+// };
+
 
 const findById = (id) => users.find(u => u.id === parseInt(id));
 

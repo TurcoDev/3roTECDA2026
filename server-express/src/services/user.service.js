@@ -2,8 +2,8 @@
 
 import { findAll, findById, create, update, deleteElement } from '../models/user.model.js';
 
-const getAllUsers = () => {
-  return findAll();
+const getAllUsers = async () => {
+  return await findAll();
 };
 
 const getUserById = (id) => {
