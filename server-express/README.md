@@ -163,3 +163,158 @@ fetch('http://localhost:3000/api/users')
 Notas:
 - Si usas otro puerto para el frontend, reemplaza `http://localhost:5173` por la URL correcta.
 - En producción, restringe `origin` a los dominios que realmente necesites.
+
+---
+
+## Conexión a una base de datos MySQL con Express.js (visto en clase)
+
+En clase hemos visto cómo conectar un proyecto Express.js a una base de datos MySQL, instalar MySQL en la máquina de desarrollo, y cómo hacer consultas seguras desde rutas o modelos. A continuación se muestran pasos, ejemplos y buenas prácticas.
+
+**Instalación de MySQL (Linux / macOS)**
+
+- Ubuntu/Debian (ejemplo):
+
+```bash
+sudo apt update
+sudo apt install mysql-server
+sudo mysql_secure_installation
+sudo systemctl start mysql
+sudo systemctl enable mysql
+mysql --version
+```
+
+- macOS (Homebrew):
+
+```bash
+brew install mysql
+brew services start mysql
+```
+
+Después de instalar, crea la base de datos y un usuario dedicado para la aplicación:
+
+```sql
+-- En el cliente mysql (por ejemplo: sudo mysql -u root -p)
+CREATE DATABASE tecda;
+CREATE USER 'tecda_user'@'localhost' IDENTIFIED BY 'tu_password';
+GRANT ALL PRIVILEGES ON tecda.* TO 'tecda_user'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+**Dependencias npm (en la carpeta del proyecto `server-express`)**
+
+Instala el cliente MySQL y `dotenv` para gestionar variables de entorno:
+
+```bash
+npm install mysql2 dotenv
+```
+
+**Variables de entorno (.env)**
+
+Ejemplo de archivo `.env` en la raíz de `server-express`:
+
+```
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=tecda_user
+DB_PASSWORD=tu_password
+DB_NAME=tecda
+```
+
+**Conexión recomendada: `mysql2` con pool y promesas**
+
+Se recomienda usar `mysql2/promise` y un `pool` de conexiones para producción. Crea (o reemplaza) `src/db/dbConnect.js` con algo parecido a lo siguiente:
+
+```js
+// src/db/dbConnect.js (recomendado)
+import mysql from 'mysql2/promise';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const connection = mysql.createPool({
+  host: process.env.DB_HOST || 'localhost',
+  port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 3306,
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'tecda',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
+
+export default connection;
+```
+
+En este repositorio hay un `src/db/dbConnect.js` que muestra una conexión simple con `mysql2` (callbacks); y `src/models/user.model.js` que contiene ejemplos con callbacks y comentarios para la versión con promesas. Puedes revisarlos como guía.
+
+**Ejemplos de consultas desde rutas o modelos (async/await)**
+
+```js
+import connection from './src/db/dbConnect.js';
+
+// SELECT
+app.get('/api/users', async (req, res) => {
+  try {
+    const [rows] = await connection.query('SELECT * FROM user;');
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error en la consulta' });
+  }
+});
+
+// INSERT (parametrizado)
+app.post('/api/users', async (req, res) => {
+  const { name, email } = req.body;
+  try {
+    const [result] = await connection.execute(
+      'INSERT INTO user (name, email) VALUES (?, ?)',
+      [name, email]
+    );
+    res.status(201).json({ insertId: result.insertId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'No se pudo insertar el usuario' });
+  }
+});
+
+// UPDATE
+await connection.execute('UPDATE user SET name = ? WHERE id = ?', [name, id]);
+
+// DELETE
+await connection.execute('DELETE FROM user WHERE id = ?', [id]);
+```
+
+**Transacciones**
+
+Para operaciones que deben ser atómicas, usa `getConnection()` y transacciones:
+
+```js
+const conn = await connection.getConnection();
+try {
+  await conn.beginTransaction();
+  await conn.query('UPDATE accounts SET balance = balance - ? WHERE id = ?', [amount, fromId]);
+  await conn.query('UPDATE accounts SET balance = balance + ? WHERE id = ?', [amount, toId]);
+  await conn.commit();
+} catch (err) {
+  await conn.rollback();
+  throw err;
+} finally {
+  conn.release();
+}
+```
+
+**Buenas prácticas y notas**
+
+- Usa consultas parametrizadas (`?`) o `execute()` para evitar inyección SQL.
+- No uses el usuario `root` en producción; crea un usuario con mínimos permisos necesarios.
+- Guarda credenciales en variables de entorno y no las subas al repositorio.
+- Prefiere un `pool` de conexiones en entornos con concurrencia.
+- Maneja errores y libera conexiones en `finally`.
+
+**Archivos de referencia en este repo**
+
+- Conexión simple (actual): [server-express/src/db/dbConnect.js](server-express/src/db/dbConnect.js#L1-L50)
+- Ejemplos de uso en modelos: [server-express/src/models/user.model.js](server-express/src/models/user.model.js#L1-L200)
+
+---
